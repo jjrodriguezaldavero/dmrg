@@ -1,6 +1,0 @@
-TODO for the Sutherland model:
-
-- Extract central charges for larger values of L to make sure that it is 2.
-- Study the energy gaps for excited states above the degeneracy.
-- Clean up the rough topography circle to show the reflection symmetry along theta=pi/4.
-- Extract scaling dimensions along the sector.

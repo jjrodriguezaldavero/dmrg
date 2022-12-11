@@ -1,3 +1,0 @@
-TODO for the ANNNI model:
-
-- Compute Frustration Free line.

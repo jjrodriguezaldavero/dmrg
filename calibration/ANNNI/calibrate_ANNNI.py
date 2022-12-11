@@ -7,7 +7,6 @@ import logging
 sys.path.append("/home/juanjo/Code/dmrg")
 
 from models.ANNNI import ANNNI
-from models.ANNNI import ANNNIMERA
 
 from tools.Processor.ProcessorANNNI import ProcessorANNNI
 
@@ -37,9 +36,9 @@ def test_DMRG(L, D, U, E, verbose=False):
         'conserve': 'Q',
         'bc_MPS': 'finite',
         'L': L,
-        'F': D,
+        'D': D,
         'U': U,
-        'V': E
+        'E': E
     }
     sector_params = {
         'sectors': [0],
@@ -56,12 +55,12 @@ def test_DMRG(L, D, U, E, verbose=False):
             point = pickle.load(f)
     except:
         model = ANNNI(model_params)
-        point, _ = DMRG.run(dmrg_params, model, sector_params)
+        point, _ = DMRG.run(dmrg_params, model, sector_params, q=2, correlation_operators=("sx", "sx"))
         with open(simulation_path + 'data/' + name, 'wb+') as f:
             pickle.dump(point, f, 2)
 
     energies = round(point["energies"][0], 4)
-    Processor = ProcessorANNNI(H_params={'D': 1, 'L': [L], 'E': [E], 'U': [U]}, sector_params=None, simulation_path=simulation_path)
+    Processor = ProcessorANNNI(H_params={'D': [1], 'L': [L], 'E': [E], 'U': [U]}, sector_params=None, simulation_path=simulation_path)
     Processor.build_array()
     charges = Processor.compute_central_charges_fit()
     charges = round(charges[0][0][0][0], 4)
@@ -111,8 +110,8 @@ D = 1
 U = 1
 E = 1
 
-# energiesDMRG, chargesDMRG = test_DMRG(L, D, U, E, verbose=True)
-# print("DMRG | Energy: {} | Energy density: {} | Central charge: {} ".format(energiesDMRG, energiesDMRG / L, chargesDMRG))
+energiesDMRG, chargesDMRG = test_DMRG(L, D, U, E, verbose=True)
+print("DMRG | Energy: {} | Energy density: {} | Central charge: {} ".format(energiesDMRG, energiesDMRG / L, chargesDMRG))
 
 energiesMERA, chargesMERA = test_MERA(D, U, E, chis=[6, 8, 10], chimids=[4, 6, 8], iters=[2000,1800,1600])
 print("MERA | Energy: {} | Fusion coefficients: {}, {}, {}".format(energiesMERA, chargesMERA[0], chargesMERA[1], chargesMERA[2]))
