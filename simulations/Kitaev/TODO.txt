@@ -1,0 +1,4 @@
+TODO for the Kitaev model:
+
+- Compute scaling dimensions with MERA at the critical point.
+- Compare analytical energy with DMRG.
