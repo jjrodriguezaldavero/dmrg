@@ -1,0 +1,36 @@
+In general:
+    - Restyle the plots for the thesis.
+    - Figure out the relation between fusion (OPE) coefficients and the central charge.
+
+ANNNI:
+
+ANNNP:
+    FiniteSizeScaling:
+        OK SIMULATIONS: C1
+        - Compute finite size scaling close to G2 with a finite value of V. *
+        - Compute finite size scaling at C2. *
+    FrustrationFree:
+        OK SIMULATIONS: 
+        - Plot the data I already have for the log scale planes at G1.
+        - Plot higher excited states to simul the Figure 3 in Jurriaan's paper.
+        - Compute frustration free planes in log scale in G2 and G3. Always with PBCs. *
+    RoughTopography:
+        OK SIMULATIONS: 
+        - Compute the FU plane for V = -0.2, 0, 0.2 to get the critical points for the plane
+        - Repeat the UV plane simulation with the canonical flags to filter unconverged points.
+    ScalingDimensions:
+        - Compute the scaling dimensions and central charge for C1, C2 and close to G2. *
+
+
+Sutherland:
+    PhaseDiagram:
+        - Compute central charges for very large system sizes with the fitting function (200-300)
+        - Clean up plots for the data I already have.
+    RoughTopography:
+        - Repeat the simulations for mid sizes filtering out unconverged points to show symmetry.
+    ScalingDimensions:
+        - Compute scaling dimensions with smaller energy tolerance (1e-7)
+
+TFI:
+    ExactDiagonalization:
+        - Compare ED, DMRG and the analytical energies.

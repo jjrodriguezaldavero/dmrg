@@ -1,5 +1,5 @@
 """
-Simulation of frustration-free effects for the ANNNP model at the G1 point.
+Simulation of frustration-free effects for the ANNNP model at the G3 point.
 """
 
 import numpy as np
@@ -31,11 +31,12 @@ algo_params = {
 }
 
 # Hamiltonian parameters for the point G1: (U, F) = (0, 0)
+G3 = tools.compute_peschel_emery(r=0.5)
 H_params = {
-    'L': np.array([4, 8, 12, 16, 24, 32]), 
-    'F': tools.compute_fss_range(central_value=(0), n=8, delta=0.2),
-    'U': tools.compute_fss_range(central_value=(0), n=8, delta=0.2),
-    'V': np.array([0.0])
+    'L': np.array([4, 8, 12, 16, 24]), 
+    'F': tools.compute_fss_range(central_value=G3['F'], n=8, delta=0.2),
+    'U': np.array([G3['U']]),
+    'V': tools.compute_fss_range(central_value=G3['V'], n=8, delta=0.2)
 }
 
 # Sector parameters

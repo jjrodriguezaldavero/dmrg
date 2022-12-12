@@ -7,7 +7,7 @@ import numpy as np
 from tools.MERAEngine import doVarMERA, doConformalMERA
 
 
-def run(mera_params, model, d=3):
+def run(mera_params, model):
     """
     Runs the MERA.
     """
@@ -15,7 +15,8 @@ def run(mera_params, model, d=3):
     """
     1. Initialize tensors
     """
-
+    d = mera_params['d']
+    chi = mera_params['chi_init']
     mera_params['layers_init'] = int(max(mera_params['layers_init'], np.ceil(np.log(chi) / (2 * np.log(4)))))
     hbig = model
     hamAB = [0] * (mera_params['layers_init'] + 2)
@@ -60,13 +61,12 @@ def run(mera_params, model, d=3):
     # Set parameters
     E_tol = mera_params['E_tol']
     iters = mera_params['iters_init']
-    chi = mera_params['chi_init']
     layers = mera_params['layers_init']
-    sciter = mera_params['sciter']
+    sciter = 4
 
     for _ in range(mera_params['max_rounds']):
         # Perform variational optimization
-        energies, tensors, converged = doVarMERA(energies, tensors, E_tol, iters, chi, chi - 2, layers, sciter)
+        energies, tensors, converged = doVarMERA(tensors, E_tol, iters, chi, chi - 2, layers, sciter)
         if converged == True: break
 
         # Update parameters
@@ -76,8 +76,13 @@ def run(mera_params, model, d=3):
 
     # Compute the conformal data from the optimized MERA
     scnum = mera_params['scnum']
-    scDims, scOps, _ = doConformalMERA(wC[-1], uC[-1], vC[-1], rhoBA[-1], scnum)
+    scDims, scOps, Cfusion = doConformalMERA(wC[-1], uC[-1], vC[-1], rhoBA[-1], scnum)
 
-    point = {'energies': energies, 'scDims': scDims, 'scOps': scOps}
+    point = {
+        'energies': energies, 
+        'scaling_dimensions': scDims, 
+        'scaling_operators': scOps, 
+        'OPE_coefficients': Cfusion
+    }
 
     return point, tensors

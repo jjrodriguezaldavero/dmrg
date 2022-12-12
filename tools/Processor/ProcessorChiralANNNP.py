@@ -1,5 +1,5 @@
 """
-Class that processes a folder with data and creates multidimensional arrays of observables for the ANNNI model.
+Class that processes a folder with data and creates multidimensional arrays of observables for the Chiral ANNNP model.
 """
 
 import numpy as np
@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 import pickle
 from itertools import product
 
-class ProcessorANNNI():
+class ProcessorChiralANNNP():
     """
     Class that contains all the processing functions needed for DMRG data.
     """
@@ -24,7 +24,7 @@ class ProcessorANNNI():
         Initializes and populates arrays containing DMRG observables for several simulation points.
         """
         # Initializes empty arrays with the dimension of the simulation points cartesian product.
-        dimensions = (len(self.H_params['L']), len(self.H_params['D']), len(self.H_params['U']), len(self.H_params['E']))
+        dimensions = (len(self.H_params['L']), len(self.H_params['F']), len(self.H_params['U']), len(self.H_params['V']))
         array_energies = np.zeros(dimensions, dtype=object)
         array_entropies = np.zeros(dimensions, dtype=object)
         array_correlations = np.zeros(dimensions, dtype=object)
@@ -37,8 +37,8 @@ class ProcessorANNNI():
             yield from zip(product(*(range(len(x)) for x in args)), product(*args))
         
         # Loads or computes DMRG observables from each simulation point into the empty arrays and returns them in a dictionary.
-        for index, values in enumerated_product(self.H_params['L'], self.H_params['D'], self.H_params['U'], self.H_params['E']):
-            value = {'L': float(values[0]), 'D': float(values[1]), 'U': float(values[2]), 'E': float(values[3])}
+        for index, values in enumerated_product(self.H_params['L'], self.H_params['F'], self.H_params['U'], self.H_params['V']):
+            value = {'L': float(values[0]), 'F': float(values[1]), 'U': float(values[2]), 'V': float(values[3])}
             name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in value.items())[:-1]
             try:
                 print("Trying to load {}".format(name))
@@ -50,7 +50,10 @@ class ProcessorANNNI():
             array_energies[index] = point['energies']
             array_entropies[index] = point['entropy']
             array_correlations[index] = point['correlation']
-            array_convergences[index] = point['convergences']
+            try:
+                array_convergences[index] = point['converged']
+            except:
+                array_convergences[index] = None
 
         self.array = {
             "energies": array_energies, 
@@ -86,6 +89,7 @@ class ProcessorANNNI():
     def compute_central_charges_fit(self, end_cut=1):
         """
         Computes an array of central charges from an array of entanglement entropies by fitting the Calabrese-Cardy formula.
+        The parameter end_cut eliminates some entropies at the edges for better convergence.
         """
         try:
             entropies = self.array["entropies"]
@@ -124,6 +128,28 @@ class ProcessorANNNI():
         for index in product(range(gaps.shape[0]), range(gaps.shape[1]), range(gaps.shape[2]), range(gaps.shape[3]), range(gaps.shape[4])):
             gaps[index] = (energies[index[1:]])[index[0] + 1] - (energies[index[1:]])[index[0]]
         return gaps
+
+
+    def compute_betas(self):
+        """
+        Computes an array of Callan-Symanzik beta functions from an array of energies and energy gaps.
+        """
+        try:
+            energies = self.array["energies"]
+        except:
+            energies = self.build_array()["energies"]
+
+        #Need the gaps in advance to compute the gradient
+        gaps = self.compute_gaps()[0] #Use first gap only
+
+        betas = np.zeros((energies.shape[0], energies.shape[1] - 1, energies.shape[2], energies.shape[3]))
+        for index in product(range(energies.shape[0]), range(energies.shape[1] - 1), range(energies.shape[2]), range(energies.shape[3])):
+            f = self.H_params['F'][index[1]]
+            delta_f = self.H_params['F'][index[1] + 1] - self.H_params['F'][index[1]]
+            delta_gap = gaps[tuple(map(sum, zip(index, (0,1,0,0))))] - gaps[index] #Revisar
+            beta = gaps[index] / (gaps[index] - 2 * f * delta_gap / delta_f) 
+            betas[index] = beta
+        return betas
 
 
     def compute_correlations(self):
@@ -166,5 +192,5 @@ class ProcessorANNNI():
         charges = self.compute_central_charges_fit()
         result = np.where(charges[0] > threshold)
 
-        critical_indices = {'D': result[0], 'U': result[1], 'E': result[2]}
+        critical_indices = {'F': result[0], 'U': result[1], 'V': result[2]}
         return critical_indices

@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 
 
 
-def doVarMERA(energies, tensors, E_tol, iters, chi, chimid, trlayers, sciter):
+def doVarMERA(tensors, E_tol, iters, chi, chimid, trlayers, sciter):
   """
   Variational energy minimization of (scale-invariant) modified binary MERA
   for nearest neighbour 1D Hamiltonian. Inputs 'hamAB, hamBA, rhoAB, rhoBA,
@@ -81,10 +81,13 @@ def doVarMERA(energies, tensors, E_tol, iters, chi, chimid, trlayers, sciter):
   hamBA[0] = hamBA[0] - bias * np.eye(chiZ[0]**2).reshape(chiZ[0], chiZ[0], chiZ[0], chiZ[0])
 
   times = np.zeros((10))
+  energies = np.array([0])
+
+  # Start loop
   for k in range(iters):
     tick = round(time.time(), 3)
     if np.mod(k, 10) == 0:
-      timed = tick - times[0] if k!= 0 else 0
+      timed = tick - times[0] if k != 0 else 0
     times[np.mod(k, 10)] = tick
 
     # Find scale-invariant density matrix (via power method)
@@ -103,14 +106,15 @@ def doVarMERA(energies, tensors, E_tol, iters, chi, chimid, trlayers, sciter):
     # Compute energy and display
     if verbose:
       if np.mod(k, 10) == 0:
-        energy_new = (ncon([rhoAB[0], hamAB[0]], [[1, 2, 3, 4], [1, 2, 3, 4]]) + 
+        energy = (ncon([rhoAB[0], hamAB[0]], [[1, 2, 3, 4], [1, 2, 3, 4]]) + 
           ncon([rhoBA[0], hamBA[0]], [[1, 2, 3, 4], [1, 2, 3, 4]])) / 4 + bias / 2
-        energy_new = energy_new.real
-        energy_delta = energy_new - energies[-1]
-        #timed = times[0] - times[-1] if k!=0 else 0
-        print('Chi %d | Iteration: %d of %d | Energy: %f | Delta_E: %f | Time: %.2f' %
-              (chi, k, iters, energy_new, energy_delta, timed))
-        energies = np.append(energies, energy_new)
+        energy = energy.real
+        energy_delta = energy - energies[-1]
+
+        print('Chi %d | Iteration: %d of %d | Energy: %.8f | Delta_E: %.8f | Time: %.2f seconds' %
+              (chi, k, iters, energy, energy_delta, timed))
+        
+        energies = np.append(energies, energy)
 
         if abs(energy_delta) <= E_tol:
           converged = True
@@ -135,7 +139,7 @@ def doVarMERA(energies, tensors, E_tol, iters, chi, chimid, trlayers, sciter):
 
       hamAB[p + 1], hamBA[p + 1] = AscendSuper(hamAB[p], hamBA[p], wC[p], vC[p],uC[p], refsym)
 
-      if converged == True: break
+    if converged == True: break
 
   hamAB[0] = hamABstart
   hamBA[0] = hamBAstart

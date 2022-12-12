@@ -29,6 +29,7 @@ class ProcessorSutherland():
         array_energies = np.zeros(dimensions, dtype=object)
         array_entropies = np.zeros(dimensions, dtype=object)
         array_correlations = np.zeros(dimensions, dtype=object)
+        array_convergences = np.zeros(dimensions, dtype=object)
 
         def enumerated_product(*args):
             """
@@ -50,8 +51,14 @@ class ProcessorSutherland():
             array_energies[index] = point['energies']
             array_entropies[index] = point['entropy']
             array_correlations[index] = point['correlation']
+            array_convergences[index] = point['convergences']
 
-        self.array = {"energies": array_energies, "entropies": array_entropies, "correlations": array_correlations}
+        self.array = {
+            "energies": array_energies, 
+            "entropies": array_entropies, 
+            "correlations": array_correlations,
+            "convergences": array_convergences
+        }
 
         return self.array
 

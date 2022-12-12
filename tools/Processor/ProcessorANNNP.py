@@ -28,6 +28,7 @@ class ProcessorANNNP():
         array_energies = np.zeros(dimensions, dtype=object)
         array_entropies = np.zeros(dimensions, dtype=object)
         array_correlations = np.zeros(dimensions, dtype=object)
+        array_convergences = np.zeros(dimensions, dtype=object)
 
         def enumerated_product(*args):
             """
@@ -49,8 +50,17 @@ class ProcessorANNNP():
             array_energies[index] = point['energies']
             array_entropies[index] = point['entropy']
             array_correlations[index] = point['correlation']
+            try:
+                array_convergences[index] = point['converged']
+            except:
+                array_convergences[index] = None
 
-        self.array = {"energies": array_energies, "entropies": array_entropies, "correlations": array_correlations}
+        self.array = {
+            "energies": array_energies, 
+            "entropies": array_entropies, 
+            "correlations": array_correlations,
+            "convergences": array_convergences
+        }
 
         return self.array
 

@@ -107,7 +107,7 @@ class PlotterANNNP(Plotter):
         """
 
         # Set axes and plot dimensions
-        ax = plt.figure().gca(projection='3d')
+        ax = plt.figure().add_subplot(projection='3d')
         ax.grid(False)
         U0, U1 = -1.5, 1.5
         F0, F1 = -1, 4

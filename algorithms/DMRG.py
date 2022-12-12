@@ -19,7 +19,7 @@ def random_initial_product_state(q, L, sector):
     assert charge==sector
     return state
 
-def run(dmrg_params, model, sector_params, q=3, correlation_operators=("s", "sD")):
+def run(dmrg_params, model, sector_params, q, correlation_operators):
     """
     Runs DMRG.
     """
@@ -51,20 +51,17 @@ def run(dmrg_params, model, sector_params, q=3, correlation_operators=("s", "sD"
 
     order_of_states = np.argsort(energies)
     states = [states[i] for i in order_of_states]
-    energies = [energies[i] for i in order_of_states][:sector_params['n_states']]
 
+    energies = [energies[i] for i in order_of_states][:sector_params['n_states']]
     entropies = states[0].entanglement_entropy()
     correlations = states[0].correlation_function(correlation_operators[0], correlation_operators[1])
-    
-    canonical_form = [states[i].norm_test() for i in order_of_states]
-    sanity = [states[i].test_sanity() for i in order_of_states]
+    canonical_flags = [states[i].canonical_flag for i in order_of_states]
 
     point = {
         "energies": energies, 
         "entropy": entropies, 
         "correlation": correlations, 
-        "canonical": canonical_form,
-        "sanity": sanity
+        "convergences": canonical_flags
     }
 
     return point, states

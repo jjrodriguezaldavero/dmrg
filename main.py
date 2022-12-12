@@ -5,7 +5,7 @@ import logging
 
 
 ###########################################################
-SIMULATION_PATH = "simulations/Sutherland/ScalingDimensions/" # IMPORTANT: it must end in /
+SIMULATION_PATH = "simulations/Sutherland/RoughTopography/Circle/" # IMPORTANT: it must end in /
 ###########################################################
 USE_CLUSTER = False
 PARALLEL = False

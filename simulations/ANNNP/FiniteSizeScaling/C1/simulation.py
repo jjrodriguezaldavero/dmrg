@@ -33,7 +33,7 @@ algo_params = {
 
 # Hamiltonian parameters for the point C1: (U, F) = (0, 1) performing a cut along the F parameter
 H_params = {
-    'L': np.array([64, 70, 76, 82, 88, 94, 100]), 
+    'L': np.array([3, 64, 70, 76, 82, 88, 94, 100]), 
     'F': tools.compute_fss_range(central_value=1, n=8, delta=0.004),
     'U': np.array([0]),
     'V': np.array([0.0])
@@ -50,7 +50,7 @@ sector_params = {
 def run(workers, simulation_path, parallel, use_cluster):
     """Run a pool workers in parallel"""
 
-    worker = tools.build_worker(Model, Algorithm, model_params, algo_params, sector_params, simulation_path)
+    worker = tools.build_worker_DMRG(Model, model_params, algo_params, sector_params, simulation_path)
     iterable = np.stack(np.meshgrid(H_params['L'], H_params['F'], H_params['U'], H_params['V']), -1).reshape(-1,4)
 
     if parallel == True:

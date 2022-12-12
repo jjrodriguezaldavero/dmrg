@@ -8,6 +8,7 @@ import pickle
 import os
 
 from tenpy.algorithms.exact_diag import ExactDiag
+from algorithms import DMRG, MERA
 
 def find_nearest(array, value):
     """
@@ -97,7 +98,7 @@ def compute_peschel_emery(r):
     return {'U': U, 'F': F, 'V': V}
 
 
-def build_MERA_from_Model(Model, model_params, d=3):
+def build_MERA_from_Model(Model, model_params, d):
     """
     Builds a hamiltonian suitable for MERA from the two-site periodic hamiltonian 
     """
@@ -111,86 +112,78 @@ def build_MERA_from_Model(Model, model_params, d=3):
     return H_four
 
 
-def build_worker(Model, Algorithm, model_params, algo_params, sector_params, simulation_path):
+def build_worker_DMRG(Model, model_params, algo_params, sector_params, simulation_path):
     """
     Builds a worker for DMRG and a given model.
     """
     if Model.__module__ == "models.ANNNP":
-        def worker(value):
-            H_params = {'L': value[0], 'F': value[1], 'U': value[2], 'V': value[3]}
-            name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in H_params.items())[:-1]
-            data_path = simulation_path + "data/"
-            os.makedirs(data_path, exist_ok=True)
-
-            try:
-                print("Trying to load {}".format(name))
-                with open(data_path + name, 'rb') as f:
-                    pickle.load(f)
-            except:
-                model_params.update(H_params)
-                if Algorithm.__name__ == "algorithms.MERA":
-                    os.makedirs(data_path + 'checkpoints/', exist_ok=True)
-                    algo_params.update({'name': name, 'simulation_path': simulation_path}) # For checkpoints
-                    model = build_MERA_from_Model(Model, model_params)
-                    data = Algorithm.run(algo_params, model)
-                else:
-                    model = Model(model_params)
-                    data, _ = Algorithm.run(algo_params, model, sector_params)
-                with open(data_path + name, 'wb+') as f:
-                    pickle.dump(data, f, 2)
-
-    elif Model.__module__ == "models.ANNNI":
-        def worker(value):
-            H_params = {'L': value[0], 'D': value[1], 'U': value[2], 'E': value[3]}
-            name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in H_params.items())[:-1]
-
-            data_path = simulation_path + "data/"
-            os.makedirs(data_path, exist_ok=True)
-
-            try:
-                print("Trying to load {}".format(name))
-                with open(data_path + name, 'rb') as f:
-                    pickle.load(f)
-            except:
-                model_params.update(H_params)
-                if Algorithm.__name__ == "algorithms.MERA":
-                    os.makedirs(data_path + 'checkpoints/', exist_ok=True)
-                    algo_params.update({'name': name, 'simulation_path': simulation_path}) # For checkpoints
-                    model = build_MERA_from_Model(Model, model_params)
-                    data = Algorithm.run(algo_params, model)
-                else:
-                    model = Model(model_params)
-                    data, _ = Algorithm.run(algo_params, model, sector_params, q=2, correlation_operators=("sx", "sx"))
-                with open(data_path + name, 'wb+') as f:
-                    pickle.dump(data, f, 2)
+        parameters = ['L', 'F', 'U', 'V']
+        q = 3
+        correlation_operators = ("s", "sD")
 
     elif Model.__module__ == "models.Sutherland":
-        def worker(value):
-            H_params = {'L': value[0], 'theta': value[1]}
-            name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in H_params.items())[:-1]
+        parameters = ['L', 'theta']
+        q = 3
+        correlation_operators = ("s", "sD")
 
-            data_path = simulation_path + "data/"
-            os.makedirs(data_path, exist_ok=True)
+    elif Model.__module__ == "models.ANNNI":
+        parameters = ['L', 'D', 'U', 'E']
+        q = 2
+        correlation_operators = ("sz", "sz")
 
-            try:
-                print("Trying to load {}".format(name))
-                with open(data_path + name, 'rb') as f:
-                    pickle.load(f)
-            except:
-                model_params.update(H_params)
-                if Algorithm.__name__ == "algorithms.MERA":
-                    os.makedirs(data_path + 'checkpoints/', exist_ok=True)
-                    algo_params.update({'name': name, 'simulation_path': simulation_path})
-                    model = build_MERA_from_Model(Model, model_params)
-                    data, _ = Algorithm.run(algo_params, model)
-                else:
-                    model = Model(model_params)
-                    data, _ = Algorithm.run(algo_params, model, sector_params)
-                with open(data_path + name, 'wb+') as f:
-                    pickle.dump(data, f, 2)
+    # Add more models (Hamiltonian parameters, site dimension and correlation operators)
 
-    else:
-        pass #More models
+    def worker(value):
+        H_params = dict(zip(parameters, value))
+        name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in H_params.items())[:-1]
+        data_path = simulation_path + "data/"
+        os.makedirs(data_path, exist_ok=True)
+        try:
+            print("Trying to load {}".format(name))
+            with open(data_path + name, 'rb') as f:
+                pickle.load(f)
+        except:
+            model_params.update(H_params)
+            model = Model(model_params)
+            data, _ = DMRG.run(algo_params, model, sector_params, q=q, correlation_operators=correlation_operators)
+            with open(data_path + name, 'wb+') as f:
+                pickle.dump(data, f, 2)
+
+    return worker
+
+
+def build_worker_MERA(Model, algo_params, simulation_path):
+    """
+    Builds a worker for MERA and a given model.
+    """
+    if Model.__module__ == "models.ANNNP":
+        parameters = ['F', 'U', 'V']
+        d = 3
+
+    elif Model.__module__ == "models.Sutherland":
+        parameters = ['theta']
+        d = 3
+
+    elif Model.__module__ == "models.ANNNI":
+        parameters = ['D', 'U', 'E']
+        d = 2
+
+    def worker(value):
+        H_params = dict(zip(parameters, value))
+        name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in H_params.items())[:-1]
+        data_path = simulation_path + "data/"
+        os.makedirs(data_path, exist_ok=True)
+
+        try:
+            print("Trying to load {}".format(name))
+            with open(data_path + name, 'rb') as f:
+                pickle.load(f)
+        except:
+            model = build_MERA_from_Model(Model, H_params, d)
+            data = MERA.run(algo_params, model)
+
+            with open(data_path + name, 'wb+') as f:
+                pickle.dump(data, f, 2)
 
     return worker
 

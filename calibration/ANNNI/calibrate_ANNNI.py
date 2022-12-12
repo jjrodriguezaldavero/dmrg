@@ -9,6 +9,7 @@ sys.path.append("/home/juanjo/Code/dmrg")
 from models.ANNNI import ANNNI
 
 from tools.Processor.ProcessorANNNI import ProcessorANNNI
+from tools import tools
 
 from algorithms import DMRG
 from algorithms import MERA
@@ -68,44 +69,48 @@ def test_DMRG(L, D, U, E, verbose=False):
     return energies, charges
     
 
-def test_MERA(D, U ,E, iters=[2000, 1800, 1600], chis=[6, 8, 12], chimids=[4, 6, 8]):
+def test_MERA(D, U ,E):
     """
     Computes energies of ANNNP model using MERA.
     """
     mera_params = {
-        'numiter': 0,  # number of variatonal iterations
-        'refsym': True,  # impose reflection symmetry
-        'numtrans': 1,  # number of transitional layers
-        'dispon': True,  # display convergence data
-        'sciter': 4,  # iterations of power method to find density matrix,
-        'iters': iters,
-        'chis': chis,
-        'chimids': chimids,
+        'd': 2, # Site dimension
+        'E_tol': 5e-3, # Convergence criteria
+
+        # Round parameters:
+        'max_rounds': 5, 
+        'chi_init': 8,
+        'chi_step': 2,
+        'iters_init': 2400,
+        'iters_step': -200,
+        'layers_init': 1,
+        'layers_step': 1,
+
+        'scnum': 10 # Number of scaling dimensions to save
     }
 
     simulation_path = 'calibration/ANNNI/'
-    name = 'MERA_it{}_F{}_U{}_V{}'.format(sum(iters), float(D), float(U), float(E))
+    name = 'MERA_ANNNI_D{}_U{}_E{}.data'.format(float(D), float(U), float(E))
     try:
         #print("Trying to load {}".format(name))
         with open(simulation_path + 'data/' + name, 'rb') as f:
             point = pickle.load(f)
     except:
         model_params = {'J': 1, 'D': D, 'U': U, 'E': E}
-        model = ANNNI(model_params).build_MERA_hamiltonian(model_params)
-        point = MERA.run(mera_params, model, d=2)
+        model = tools.build_MERA_from_Model(ANNNI, model_params, 2)
+        point, _ = MERA.run(mera_params, model)
         with open(simulation_path + 'data/' + name, 'wb+') as f:
             pickle.dump(point, f, 2)
 
-    energies = round(point["energies"].real, 4)
-    charges = [round(point["Cess"][0].real, 4), round(point["Cess"][1].real, 4), round(point["Cess"][2].real, 4)]
-    scalings = point["scDims"]
+    energy = round(point["energies"][-1], 4)
+    charge = point["OPE_coefficients"][1,2,1].real
 
-    return energies, charges
+    return energy, charge
 
 
 #####################################################
 
-L = 50
+L = 6
 D = 1
 U = 1
 E = 1
@@ -113,5 +118,5 @@ E = 1
 energiesDMRG, chargesDMRG = test_DMRG(L, D, U, E, verbose=True)
 print("DMRG | Energy: {} | Energy density: {} | Central charge: {} ".format(energiesDMRG, energiesDMRG / L, chargesDMRG))
 
-energiesMERA, chargesMERA = test_MERA(D, U, E, chis=[6, 8, 10], chimids=[4, 6, 8], iters=[2000,1800,1600])
-print("MERA | Energy: {} | Fusion coefficients: {}, {}, {}".format(energiesMERA, chargesMERA[0], chargesMERA[1], chargesMERA[2]))
+energyMERA, chargeMERA = test_MERA(D, U, E)
+print("MERA | Energy: {} | Central charge: {}".format(energyMERA, chargeMERA))

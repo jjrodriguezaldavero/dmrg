@@ -33,8 +33,7 @@ algo_params = {
 
 # Hamiltonian parameters for the point C1: (U, F) = (0, 1) performing a cut along the F parameter
 H_params = {
-    'L': np.array([12, 18, 48, 60, 72, 84, 96, 120]), 
-    #'theta': np.array([0.0, (1/4)*np.pi, (1/2)*np.pi, (3/4)*np.pi, np.pi, (5/4)*np.pi])
+    'L': np.array([60, 72, 84, 96, 120]), 
     'theta': np.linspace(start=0, stop=np.pi/4, num=13)
 }
 
@@ -73,19 +72,5 @@ def run(workers, simulation_path, parallel, use_cluster):
         # Set critical point on which to compute scaling
         crit_x = None
 
-        plot_params = {
-            'xlabel'
-        }
-
-        #Plot figures 
-        fixed_values = None
-        Plotter = PlotterSutherland(H_params, simulation_path)
-        Plotter.plot_central_charges(charges, fixed_values)
-        Plotter.plot_central_charges(charges_fit, fixed_values, name_suffix="@fit")
-        Plotter.plot_finite_size_gaps(gaps, fixed_values, crit_x)
-        Plotter.plot_finite_size_correlations(correlations, fixed_values, crit_x)
-        Plotter.plot_fitted_gaps(gaps)
-        Plotter.plot_gap_scalings(gaps, H_params, fixed_values)
-        Plotter.plot_correlation_scalings(correlations, H_params, fixed_values)
-        
+        # Work out some nice plots!
         

@@ -6,7 +6,6 @@ import numpy as np
 from pathos.multiprocessing import ProcessingPool as Pool
 
 from models.ANNNP import ANNNP as Model
-from algorithms import DMRG as Algorithm
 
 from tools import tools
 from tools.Processor.ProcessorANNNP import ProcessorANNNP
@@ -36,7 +35,7 @@ H_params = {
     'L': np.array([64, 70, 76, 82, 88, 94, 100]), 
     'F': np.array([1.0 + np.sqrt(3)]),
     'U': tools.compute_fss_range(central_value=(0.9675), n=8, delta=0.004),
-    'V': np.array([0.0])
+    'V': np.array([0.1])
 }
 
 # Sector parameters
@@ -50,7 +49,7 @@ sector_params = {
 def run(workers, simulation_path, parallel, use_cluster):
     """Run a pool workers in parallel"""
 
-    worker = tools.build_worker(Model, Algorithm, model_params, algo_params, sector_params, simulation_path)
+    worker = tools.build_worker_DMRG(Model, model_params, algo_params, sector_params, simulation_path)
     iterable = np.stack(np.meshgrid(H_params['L'], H_params['F'], H_params['U'], H_params['V']), -1).reshape(-1,4)
 
     if parallel == True:
@@ -77,10 +76,16 @@ def run(workers, simulation_path, parallel, use_cluster):
         #Plot figures 
         Plotter = PlotterANNNP(H_params, simulation_path)
 
+        # Plot figures for V = 0.1
+        fixed_values = {'name_1': 'F', 'value_1': 1 + np.sqrt(3), 'name_2': 'V', 'value_2': 0.1}
+        name_suffix = '@V_01'
+        Plotter.plot_central_charges(charges, fixed_values, name_suffix=name_suffix)
+        Plotter.plot_finite_size_gaps(gaps, fixed_values, crit_x=crit_x, name_suffix=name_suffix)
+        Plotter.plot_finite_size_correlations(correlations, fixed_values, crit_x=crit_x, name_suffix=name_suffix)
+
         # Plot figures for V = 0.0
         fixed_values = {'name_1': 'F', 'value_1': 1 + np.sqrt(3), 'name_2': 'V', 'value_2': 0.0}
         name_suffix = '@V_00'
         Plotter.plot_central_charges(charges, fixed_values, name_suffix=name_suffix)
         Plotter.plot_finite_size_gaps(gaps, fixed_values, crit_x=crit_x, name_suffix=name_suffix)
-        #Plotter.plot_finite_size_betas(betas, fixed_values, crit_x=crit_x, name_suffix=name_suffix)
         Plotter.plot_finite_size_correlations(correlations, fixed_values, crit_x=crit_x, name_suffix=name_suffix)
