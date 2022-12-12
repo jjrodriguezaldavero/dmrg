@@ -31,7 +31,7 @@ algo_params = {
 
 # Hamiltonian parameters
 H_params = {
-    'theta': np.linspace(start=0, stop=np.pi/4, num=9)
+    'theta': np.linspace(start=0, stop=np.pi/4, num=13)
 }
 
 def run(workers, simulation_path, parallel, use_cluster):

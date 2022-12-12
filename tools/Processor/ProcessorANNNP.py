@@ -201,8 +201,10 @@ class ProcessorANNNP():
         """
         # Initializes empty arrays with the dimension of the simulation points cartesian product.
         dimensions = (len(self.H_params['F']), len(self.H_params['U']), len(self.H_params['V']))
+        array_energies = np.zeros(dimensions, dtype=object)
         array_scalings = np.zeros(dimensions, dtype=object)
         array_OPEs = np.zeros(dimensions, dtype=object)
+        array_cp = np.zeros(dimensions, dtype=object)
 
         def enumerated_product(*args):
             """
@@ -221,12 +223,16 @@ class ProcessorANNNP():
             except:
                 break
             
+            array_energies[index] = point['energies']
             array_scalings[index] = point['scaling_dimensions']
             array_OPEs[index] = point['OPE_coefficients']
+            array_cp = point['checkpoint_data']
 
         self.array = {
+            "energies": array_energies,
             "scaling_dimensions": array_scalings, 
-            "OPE_coefficients": array_OPEs
+            "OPE_coefficients": array_OPEs,
+            "checkpoint_data": array_cp
         }
 
         return self.array

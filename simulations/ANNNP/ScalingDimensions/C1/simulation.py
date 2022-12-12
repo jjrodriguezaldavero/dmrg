@@ -56,7 +56,13 @@ def run(workers, simulation_path, parallel, use_cluster):
         Processor = ProcessorANNNP(H_params, sector_params, simulation_path)
         
         array = Processor.build_MERA_array()
-
+        checkpoint = array['checkpoint_data']
+        print("Converged with tolerance {} at: Chi {} | Iters {}/{} | Layers {}".format(
+                algo_params['E_tol'],
+                array['checkpoint_data']['chi'], 
+                array['energies'][0][0][0].shape[0] * 10,
+                array['checkpoint_data']['iters'],
+                array['checkpoint_data']['layers']))
         Plotter = PlotterANNNP(H_params, simulation_path)
 
         scalings = array['scaling_dimensions'][0][0][0]

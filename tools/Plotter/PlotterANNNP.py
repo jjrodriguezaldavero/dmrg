@@ -4,11 +4,14 @@ Library with plotting routines specific for the ANNNP model.
 
 import numpy as np
 from scipy.optimize import curve_fit
+from scipy import interpolate
 
 import matplotlib.pyplot as plt
-from matplotlib import cm
+import matplotlib.ticker as mticker
+from matplotlib import colors, ticker, cm
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
+from matplotlib.colors import LogNorm
 
 from tools.Plotter.Plotter import Plotter
 from tools import tools as t
@@ -212,12 +215,12 @@ class PlotterANNNP(Plotter):
         plt.show()
 
 
-    def plot_frustration_free_fit(self, gaps, fixed_values, name_suffix=''):
+    def plot_frustration_free_fit_1D(self, gaps, fixed_values, name_suffix=''):
         """
         Plots the Frustration-Free effects of the energy gaps close to the Peschel-Emery line.
         """
         # Crops the multidimensional array to consider the two fixed values.
-        cropped_array, range_names, range_values = t.crop_array(gaps[0], self.H_params, fixed_values)
+        cropped_array, _, range_values = t.crop_array(gaps[0], self.H_params, fixed_values)
 
         def exponential_fit(L, a, b):
             return a * np.exp(-b * L)
@@ -270,29 +273,63 @@ class PlotterANNNP(Plotter):
     #     # ax.set_zlim(0,np.max(fit))
     #     # plt.show()
     
-    def plot_frustration_free_planes(self, gaps):
-        gaps = gaps[0]
-        x = self.H_params['F']
-        y = self.H_params['U']
-        L = self.H_params['L']
+    def plot_frustration_free_fit_2D(self, gaps, fixed_value, type='contour'):
+        """
+        Plots the Frustration-Free effects of the energy gaps close to the Peschel-Emery line.
+        """
+        cropped_array, range_names, range_values = t.crop_array_1(gaps, self.H_params, fixed_value)
+        x = range_values[0]
+        y = range_values[1]
+        L = range_values[2]
+
         X, Y = np.meshgrid(x, y)
 
-        def log_tick_formatter(val, pos=None):
-            return r"$10^{{{:.0f}}}$".format(val)
+        if type == 'surface':
+            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+            for i in range(gaps.shape[0]):
+                Z = gaps[i,:,:,0]
+                ax.plot_surface(X, Y, Z)
 
-        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-        import matplotlib.ticker as mticker
-        ax.zaxis.set_major_formatter(mticker.FuncFormatter(log_tick_formatter))
-        ax.zaxis.set_major_locator(mticker.MaxNLocator(integer=True))
-        for i in range(gaps.shape[0]):
-            Z = gaps[i,:,:,0]
-            Z[Z != 0] = np.log10(Z[Z != 0])
-            Z[Z == 0] = None
-            ax.plot_surface(X,Y,Z, label=L[i])
+            plt.savefig(self.simulation_path + 'figures/frustration_free_surface')
+            plt.show()
 
-        plt.legend(title='L:')
-        plt.show()
+        if type == 'logsurface':
+            def log_tick_formatter(val, pos=None):
+                return r"$10^{{{:.0f}}}$".format(val)
+            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+            ax.zaxis.set_major_formatter(mticker.FuncFormatter(log_tick_formatter))
+            ax.zaxis.set_major_locator(mticker.MaxNLocator(integer=True))
 
+            xint = np.linspace(x[0], x[-1], 50)
+            yint = np.linspace(y[0], y[-1], 50)
+            XX, YY = np.meshgrid(xint, yint)
+
+            for i in range(gaps.shape[0]):
+                Z = gaps[i,:,:,0]
+                Z[Z != 0] = np.log10(Z[Z != 0])
+                Z[Z == 0] = -15
+                f = interpolate.RectBivariateSpline(x, y, Z.T, kx=3, ky=3)
+                #ax.plot_surface(XX,YY,f(xint, yint), label=L[i])
+                ax.plot_surface(X, Y, Z, label=L[i])
+            
+            plt.savefig(self.simulation_path + 'figures/frustration_free_logsurface')
+            plt.show()
+
+        elif type == 'contour':
+            Z = gaps[0,:,:,0]
+            Z = np.ma.masked_where(Z <= 0, Z)
+            lev_exp = np.arange(np.floor(np.log10(Z.min())), np.ceil(np.log10(Z.max())))
+            levs = np.power(10, lev_exp)
+
+            xint = np.linspace(x[0], x[-1], 50)
+            yint = np.linspace(y[0], y[-1], 50)
+            XX, YY = np.meshgrid(xint, yint)
+            f = interpolate.RectBivariateSpline(x, y, Z.T, kx=3, ky=3)
+
+            cs = plt.contourf(XX, YY, f(xint, yint))#), levs, norm=colors.LogNorm())
+
+            plt.savefig(self.simulation_path + 'figures/frustration_free_contour')
+            plt.show()
     
     def plot_scalings(self, scalings, exact_scalings=None, name_suffix=''):
         """

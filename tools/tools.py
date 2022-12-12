@@ -42,6 +42,25 @@ def crop_array(array, ranges, fixed_values):
         range_names = list(reversed(ranges.keys()))
         range_values = list(reversed(ranges.values()))
         return array.T, range_names, range_values
+    
+
+def crop_array_1(array, ranges, fixed_value):
+    """
+    Crops an array given one fixed value.
+    """
+    names = list(ranges.keys()); indices = [0, 1, 2, 3]
+
+    name_index = names.index(fixed_value['name'])
+    value_index = np.where(np.asarray(ranges[fixed_value['name']]) == float(fixed_value['value']))[0][0]
+    
+    indices.pop(name_index)
+
+    cropped_array = np.transpose(np.take(array, value_index, name_index))
+    range_names = [names[indices[2]], names[indices[1]], names[indices[0]]]
+    range_values = [ranges[names[indices[2]]], ranges[names[indices[1]]], ranges[names[indices[0]]]]
+
+    return cropped_array, range_names, range_values 
+
 
 
 def compute_critical_exponent(observable, ranges, fixed_values, crit_val):
@@ -180,11 +199,11 @@ def build_worker_MERA(Model, mera_params, simulation_path, use_checkpoint=False)
             with open(data_path + name, 'rb') as f:
                 _, saved_tensors = pickle.load(f)
             if use_checkpoint:
-                point, tensors = MERA.run(mera_params, model, saved_tensors)
                 # Match parameters with saved data
                 mera_params['chi_init'] = point['checkpoint_data']['chi']
                 mera_params['iters_init'] = point['checkpoint_data']['iters']
                 mera_params['layers_init'] = point['checkpoint_data']['layers']
+                point, tensors = MERA.run(mera_params, model, saved_tensors)
                 with open(data_path + name, 'wb+') as f:
                     pickle.dump((point, tensors), f, 2)
         except:

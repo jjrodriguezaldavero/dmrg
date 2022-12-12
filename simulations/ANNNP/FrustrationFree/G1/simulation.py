@@ -32,9 +32,10 @@ algo_params = {
 
 # Hamiltonian parameters for the point G1: (U, F) = (0, 0)
 H_params = {
-    'L': np.array([4, 8, 12, 16, 24, 32]), 
-    'F': tools.compute_fss_range(central_value=(0), n=8, delta=0.2),
-    'U': tools.compute_fss_range(central_value=(0), n=8, delta=0.2),
+    #'L': np.array([4, 8, 12, 16, 24, 32]), 
+    'L': np.array([4, 8]), 
+    'F': tools.compute_fss_range(central_value=(0), n=4, delta=0.1),
+    'U': tools.compute_fss_range(central_value=(0), n=4, delta=0.1),
     'V': np.array([0.0])
 }
 
@@ -71,5 +72,7 @@ def run(workers, simulation_path, parallel, use_cluster):
 
         #Plot figures 
         Plotter = PlotterANNNP(H_params, simulation_path)
+        fixed_value = {'name': 'V', 'value': 0}
+        Plotter.plot_frustration_free_fit_2D(gaps[0], fixed_value, type='surface')
 
         # Work out a plotting function
