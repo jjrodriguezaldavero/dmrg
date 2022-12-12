@@ -7,7 +7,8 @@ ANNNI:
 ANNNP:
     FiniteSizeScaling:
         OK SIMULATIONS: C1
-        - Compute finite size scaling close to G2 with a finite value of V. *
+        - Compute finite size scaling close to G2 with a finite value of V. 
+            - Figure out where is the critical point. *
         - Compute finite size scaling at C2. *
     FrustrationFree:
         OK SIMULATIONS: 

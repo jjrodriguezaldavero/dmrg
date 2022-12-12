@@ -18,7 +18,7 @@ def run(mera_params, model, tensors=None):
     d = mera_params['d']
     chi = mera_params['chi_init']
 
-    if tensors is not None:
+    if tensors is None:
         mera_params['layers_init'] = int(max(mera_params['layers_init'], np.ceil(np.log(chi) / (2 * np.log(4)))))
         hbig = model
         hamAB = [0] * (mera_params['layers_init'] + 2)

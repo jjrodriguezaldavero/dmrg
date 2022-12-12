@@ -31,6 +31,7 @@ algo_params = {
 }
 
 # Hamiltonian parameters for the point G2: (U, F) = (1, 1 + sqrt(3)) performing a cut along the F parameter
+# To-Do: figure out the critical transition at V=0.1
 H_params = {
     'L': np.array([64, 70, 76, 82, 88, 94, 100]), 
     'F': np.array([1.0 + np.sqrt(3)]),

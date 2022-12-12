@@ -273,7 +273,7 @@ class PlotterANNNP(Plotter):
     #     # ax.set_zlim(0,np.max(fit))
     #     # plt.show()
     
-    def plot_frustration_free_fit_2D(self, gaps, fixed_value, type='contour'):
+    def plot_frustration_free_fit_2D(self, gaps, fixed_value, type='contour', r=None):
         """
         Plots the Frustration-Free effects of the energy gaps close to the Peschel-Emery line.
         """
@@ -285,18 +285,28 @@ class PlotterANNNP(Plotter):
         X, Y = np.meshgrid(x, y)
 
         if type == 'surface':
-            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-            for i in range(gaps.shape[0]):
-                Z = gaps[i,:,:,0]
-                ax.plot_surface(X, Y, Z)
+            #ax = plt.figure().add_subplot(projection='3d')
+            fig, ax = plt.subplots(subplot_kw={"projection": "3d", "computed_zorder": False})
+            for i in range(len(L)):
+                Z = cropped_array[:,:,i]
+                ax.plot_surface(X, Y, Z, zorder=len(L) - i, label=L[i])
 
             plt.savefig(self.simulation_path + 'figures/frustration_free_surface')
+            
+
+            if r is not None:
+                point = t.compute_peschel_emery(r)
+                # Highlight G1
+                ax.scatter(point[range_names[0]], point[range_names[1]], 0, marker='x', s=30, color='k', zorder=20)
+                ax.text(point[range_names[0]], point[range_names[1]], 0.1, 'Peschel-Emery', size=10, zorder=10, color='k')
+            #ax.legend()
             plt.show()
 
         if type == 'logsurface':
             def log_tick_formatter(val, pos=None):
                 return r"$10^{{{:.0f}}}$".format(val)
-            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+            #ax = plt.figure().add_subplot(projection='3d')
+            _, ax = plt.subplots(subplot_kw={"projection": "3d", "computed_zorder": False})
             ax.zaxis.set_major_formatter(mticker.FuncFormatter(log_tick_formatter))
             ax.zaxis.set_major_locator(mticker.MaxNLocator(integer=True))
 
@@ -304,14 +314,26 @@ class PlotterANNNP(Plotter):
             yint = np.linspace(y[0], y[-1], 50)
             XX, YY = np.meshgrid(xint, yint)
 
-            for i in range(gaps.shape[0]):
-                Z = gaps[i,:,:,0]
+            for i in range(len(L)):
+                Z = cropped_array[:,:,i]
                 Z[Z != 0] = np.log10(Z[Z != 0])
                 Z[Z == 0] = -15
                 f = interpolate.RectBivariateSpline(x, y, Z.T, kx=3, ky=3)
-                #ax.plot_surface(XX,YY,f(xint, yint), label=L[i])
+                #ax.plot_surface(XX,YY,f(xint, yint), label=L[i], zorder=len(L) - i)
                 ax.plot_surface(X, Y, Z, label=L[i])
-            
+
+            ax.set_xlabel(range_names[0])
+            ax.set_ylabel(range_names[1])
+            ax.set_zlabel(r'Energy gap $\Delta$')
+
+            if r is not None:
+                point = t.compute_peschel_emery(r)
+                # Highlight G1
+                x = point[range_names[0]]
+                y = point[range_names[1]]
+                ax.plot([x, x], [y,y], [-15,0], color='k', linewidth=1.5, linestyle='dashed')
+                ax.text(point[range_names[0]], point[range_names[1]], 2.5, 'Peschel-Emery', size=10, zorder=10, color='k')
+            #ax.legend('L:')
             plt.savefig(self.simulation_path + 'figures/frustration_free_logsurface')
             plt.show()
 

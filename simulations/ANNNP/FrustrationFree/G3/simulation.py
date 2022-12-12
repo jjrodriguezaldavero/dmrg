@@ -33,7 +33,7 @@ algo_params = {
 # Hamiltonian parameters for the point G1: (U, F) = (0, 0)
 G3 = tools.compute_peschel_emery(r=0.5)
 H_params = {
-    'L': np.array([4, 8, 12, 16, 24]), 
+    'L': np.array([4, 8]), 
     'F': tools.compute_fss_range(central_value=G3['F'], n=8, delta=0.2),
     'U': np.array([G3['U']]),
     'V': tools.compute_fss_range(central_value=G3['V'], n=8, delta=0.2)
@@ -72,5 +72,7 @@ def run(workers, simulation_path, parallel, use_cluster):
 
         #Plot figures 
         Plotter = PlotterANNNP(H_params, simulation_path)
+        fixed_value = {'name': 'U', 'value': G3['U']}
+        Plotter.plot_frustration_free_fit_2D(gaps[0], fixed_value, type='logsurface', r=0.5)
 
         # Work out a plotting function

@@ -31,8 +31,8 @@ class Plotter():
 
         # Read plot parameters
         x_tick_periodicity = 2
-        ticks = plot_params['ticks'] if 'ticks' in plot_params else (np.arange(
-            0, len(range_values[0]), x_tick_periodicity), np.around(range_values[0], 2)[0::x_tick_periodicity])
+        ticks = plot_params['ticks'] if 'ticks' in plot_params else (
+                np.arange(0, len(range_values[0]), x_tick_periodicity), np.around(range_values[0], 4)[0::x_tick_periodicity])
         title = plot_params['title'] if 'title' in plot_params else r'Finite-size scaling for the central charge $c(L)$'
         xlabel = plot_params['xlabel'] if 'xlabel' in plot_params else r"${}$".format(range_names[0])
         ylabel = plot_params['ylabel'] if 'ylabel' in plot_params else 'Central charge c'

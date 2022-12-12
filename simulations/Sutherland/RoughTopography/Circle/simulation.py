@@ -26,13 +26,13 @@ algo_params = {
         'svd_min': 1.e-10,
         'chi_max': 500,
     },
-    'max_sweeps': 50,
+    'max_sweeps': 100,
     'max_hours': 1
 }
 
 # Hamiltonian parameters for the point C1: (U, F) = (0, 1) performing a cut along the F parameter
 H_params = {
-    'L': np.array([100]), 
+    'L': np.array([120]), 
     'theta': np.linspace(start=0, stop=2*np.pi, num=73)
 }
 
@@ -61,11 +61,12 @@ def run(workers, simulation_path, parallel, use_cluster):
 
     """Process the data"""
     Processor = ProcessorSutherland(H_params, sector_params, simulation_path)
-    charges_fit = Processor.compute_central_charges_fit()
+    charges_fit = Processor.compute_central_charges_fit(end_cut=1)
 
     """Plot phase diagram"""
     if use_cluster == False:
-        pass
+        Plotter = PlotterSutherland(H_params, simulation_path)
+        Plotter.plot_central_charges_polar(charges_fit, H_params)
 
         # Work out some nice plots!
         
