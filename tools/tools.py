@@ -112,7 +112,7 @@ def build_MERA_from_Model(Model, model_params, d):
     return H_four
 
 
-def build_worker_DMRG(Model, model_params, algo_params, sector_params, simulation_path):
+def build_worker_DMRG(Model, model_params, dmrg_params, sector_params, simulation_path):
     """
     Builds a worker for DMRG and a given model.
     """
@@ -145,14 +145,14 @@ def build_worker_DMRG(Model, model_params, algo_params, sector_params, simulatio
         except:
             model_params.update(H_params)
             model = Model(model_params)
-            data, _ = DMRG.run(algo_params, model, sector_params, q=q, correlation_operators=correlation_operators)
+            data, _ = DMRG.run(dmrg_params, model, sector_params, q=q, correlation_operators=correlation_operators)
             with open(data_path + name, 'wb+') as f:
                 pickle.dump(data, f, 2)
 
     return worker
 
 
-def build_worker_MERA(Model, algo_params, simulation_path):
+def build_worker_MERA(Model, mera_params, simulation_path, use_checkpoint=False):
     """
     Builds a worker for MERA and a given model.
     """
@@ -173,17 +173,24 @@ def build_worker_MERA(Model, algo_params, simulation_path):
         name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in H_params.items())[:-1]
         data_path = simulation_path + "data/"
         os.makedirs(data_path, exist_ok=True)
+        model = build_MERA_from_Model(Model, H_params, d)
 
         try:
             print("Trying to load {}".format(name))
             with open(data_path + name, 'rb') as f:
-                pickle.load(f)
+                _, saved_tensors = pickle.load(f)
+            if use_checkpoint:
+                point, tensors = MERA.run(mera_params, model, saved_tensors)
+                # Match parameters with saved data
+                mera_params['chi_init'] = point['checkpoint_data']['chi']
+                mera_params['iters_init'] = point['checkpoint_data']['iters']
+                mera_params['layers_init'] = point['checkpoint_data']['layers']
+                with open(data_path + name, 'wb+') as f:
+                    pickle.dump((point, tensors), f, 2)
         except:
-            model = build_MERA_from_Model(Model, H_params, d)
-            data = MERA.run(algo_params, model)
-
+            point, tensors = MERA.run(mera_params, model)
             with open(data_path + name, 'wb+') as f:
-                pickle.dump(data, f, 2)
+                pickle.dump((point, tensors), f, 2)
 
     return worker
 

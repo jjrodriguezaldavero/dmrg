@@ -15,7 +15,7 @@ from tools.Plotter.PlotterANNNP import PlotterANNNP
 # Algorithm parameters
 algo_params = {
     'd': 3,
-    'E_tol': 5e-7,
+    'E_tol': 5e-8,
 
     'max_rounds': 5,
     'chi_init': 16,
@@ -37,8 +37,9 @@ H_params = {
 
 def run(workers, simulation_path, parallel, use_cluster):
     """Run a pool workers in parallel"""
-
-    worker = tools.build_worker_MERA(Model, algo_params, simulation_path)
+    
+    use_checkpoint = True # If True, keeps computing from the checkpoint (only in the cluster)
+    worker = tools.build_worker_MERA(Model, algo_params, simulation_path, use_checkpoint and use_cluster)
     iterable = np.stack(np.meshgrid(H_params['F'], H_params['U'], H_params['V']), -1).reshape(-1,3)
 
     if parallel == True:
@@ -54,4 +55,10 @@ def run(workers, simulation_path, parallel, use_cluster):
         sector_params = {}
         Processor = ProcessorANNNP(H_params, sector_params, simulation_path)
         
-        #Work out a scaling processor and plots
+        array = Processor.build_MERA_array()
+
+        Plotter = PlotterANNNP(H_params, simulation_path)
+
+        scalings = array['scaling_dimensions'][0][0][0][:10]
+        exact_scalings = [0, 2/15, 2/15, 4/5, 2/15+1, 2/15+1, 2/15+1, 2/15+1, 4/3, 4/3]
+        Plotter.plot_scalings(scalings, exact_scalings)

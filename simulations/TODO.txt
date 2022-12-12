@@ -19,7 +19,8 @@ ANNNP:
         - Compute the FU plane for V = -0.2, 0, 0.2 to get the critical points for the plane
         - Repeat the UV plane simulation with the canonical flags to filter unconverged points.
     ScalingDimensions:
-        - Compute the scaling dimensions and central charge for C1, C2 and close to G2. *
+        - Compute the scaling dimensions and central charge for C1, C2 and close to G2. * DONE FOR C1 AND G2
+        - Repeat the simulations for C1 and G2 trying to reuse the present results for a higher resolution.
 
 
 Sutherland:

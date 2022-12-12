@@ -292,3 +292,19 @@ class PlotterANNNP(Plotter):
 
         plt.legend(title='L:')
         plt.show()
+
+    
+    def plot_scalings(self, scalings, exact_scalings=None, name_suffix=''):
+        """
+        Plots scaling dimensions coming from MERA
+        """
+        sns.set_style('whitegrid')
+        plt.plot(range(len(scalings)), scalings, 'rx', label="Numerical")
+        if exact_scalings is not None:
+            plt.plot(range(len(scalings)), exact_scalings, 'o', fillstyle='none', label="Exact")
+        plt.title('ANNNP scaling dimensions')
+        plt.xlabel('k')
+        plt.ylabel(r'Scaling Dims: $\Delta_k$')
+        plt.legend()
+        plt.savefig(self.simulation_path + 'figures/scaling_dimensions' + name_suffix)
+        plt.show()

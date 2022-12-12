@@ -5,7 +5,7 @@ import logging
 
 
 ###########################################################
-SIMULATION_PATH = "simulations/Sutherland/RoughTopography/Segment/" # IMPORTANT: it must end in /
+SIMULATION_PATH = "simulations/ANNNP/ScalingDimensions/G2/" # IMPORTANT: it must end in /
 ###########################################################
 USE_CLUSTER = False
 PARALLEL = False

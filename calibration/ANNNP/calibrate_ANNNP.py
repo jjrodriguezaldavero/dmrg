@@ -123,7 +123,6 @@ def test_MERA(F, U, V, plot=True):
         plt.title('ANNNP scaling dimensions')
         plt.xlabel('k')
         plt.ylabel(r'Scaling Dims: $\Delta_k$')
-        plt.legend()
         plt.show()
 
     return energy, charge

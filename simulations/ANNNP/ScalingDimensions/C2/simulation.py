@@ -15,7 +15,7 @@ from tools.Plotter.PlotterANNNP import PlotterANNNP
 # Algorithm parameters
 algo_params = {
     'd': 3,
-    'E_tol': 5e-7,
+    'E_tol': 5e-8,
 
     'max_rounds': 5,
     'chi_init': 16,
@@ -38,7 +38,8 @@ H_params = {
 def run(workers, simulation_path, parallel, use_cluster):
     """Run a pool workers in parallel"""
 
-    worker = tools.build_worker_MERA(Model, algo_params, simulation_path)
+    use_checkpoint=True
+    worker = tools.build_worker_MERA(Model, algo_params, simulation_path, use_checkpoint and use_cluster)
     iterable = np.stack(np.meshgrid(H_params['F'], H_params['U'], H_params['V']), -1).reshape(-1,3)
 
     if parallel == True:

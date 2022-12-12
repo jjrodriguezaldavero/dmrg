@@ -194,3 +194,39 @@ class ProcessorANNNP():
 
         critical_indices = {'F': result[0], 'U': result[1], 'V': result[2]}
         return critical_indices
+
+    def build_MERA_array(self):
+        """
+        Initializes and populates arrays containing DMRG observables for several simulation points.
+        """
+        # Initializes empty arrays with the dimension of the simulation points cartesian product.
+        dimensions = (len(self.H_params['F']), len(self.H_params['U']), len(self.H_params['V']))
+        array_scalings = np.zeros(dimensions, dtype=object)
+        array_OPEs = np.zeros(dimensions, dtype=object)
+
+        def enumerated_product(*args):
+            """
+            Helper function for accessing both the index and value from the simulation points cartesian product.
+            """
+            yield from zip(product(*(range(len(x)) for x in args)), product(*args))
+        
+        # Loads or computes DMRG observables from each simulation point into the empty arrays and returns them in a dictionary.
+        for index, values in enumerated_product(self.H_params['F'], self.H_params['U'], self.H_params['V']):
+            value = {'F': float(values[0]), 'U': float(values[1]), 'V': float(values[2])}
+            name = ''.join('{}{}_'.format(key, round(val, 4)) for key, val in value.items())[:-1]
+            try:
+                print("Trying to load {}".format(name))
+                with open(self.simulation_path + 'data/' + name, 'rb') as f:
+                    point, tensors = pickle.load(f)
+            except:
+                break
+            
+            array_scalings[index] = point['scaling_dimensions']
+            array_OPEs[index] = point['OPE_coefficients']
+
+        self.array = {
+            "scaling_dimensions": array_scalings, 
+            "OPE_coefficients": array_OPEs
+        }
+
+        return self.array

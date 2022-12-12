@@ -36,8 +36,9 @@ H_params = {
 
 def run(workers, simulation_path, parallel, use_cluster):
     """Run a pool workers in parallel"""
-
-    worker = tools.build_worker_MERA(Model, algo_params, simulation_path)
+    
+    use_checkpoint=True
+    worker = tools.build_worker_MERA(Model, algo_params, simulation_path, use_checkpoint and use_cluster)
     iterable = np.stack(np.meshgrid(H_params['theta']), -1).reshape(-1,1)
 
     if parallel == True:
