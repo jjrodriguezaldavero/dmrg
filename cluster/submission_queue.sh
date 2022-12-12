@@ -97,8 +97,8 @@ qsub -V temp.sh
 # sed -e 's/$NUMCORES/'$NUMCORES'/g' \
 #     -e 's/$WORKERCORES/'$WORKERCORES'/g' \
 #     -e 's/$QUEUENAME/'$QUEUENAME'/g' \
-#     -e 's/$NAME/'MERA_G2'/g' \
-#     -e 's/$SIMULATION/'MERA_G2.py'/g' job_script.sh > temp.sh
+#     -e 's/$NAME/'MERA_SU'/g' \
+#     -e 's/$SIMULATION/'MERA_SU.py'/g' job_script.sh > temp.sh
 # qsub -V temp.sh
 # #########################################################################
 

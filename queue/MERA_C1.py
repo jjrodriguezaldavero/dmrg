@@ -24,6 +24,7 @@ else:
     WORKERS = 4
 
 sys.path.append(SIMULATION_PATH)
+sys.path.append("/home/juanjo/Code/dmrg")
 
 from simulation import run
 
