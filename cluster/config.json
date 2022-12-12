@@ -2,5 +2,5 @@
     "NUMCORES": 16,
     "WORKERCORES": 1,
     "WORKERS": 16,
-    "QUEUENAME": "long.q"
+    "QUEUENAME": "itf.q"
 }

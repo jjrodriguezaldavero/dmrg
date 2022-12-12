@@ -5,7 +5,7 @@ import logging
 
 
 ###########################################################
-SIMULATION_PATH = "simulations/Sutherland/ScalingDimensions/Segment/"
+SIMULATION_PATH = "simulations/ANNNP/FiniteSizeScaling/G2/"
 ###########################################################
 USE_CLUSTER = True
 PARALLEL = True

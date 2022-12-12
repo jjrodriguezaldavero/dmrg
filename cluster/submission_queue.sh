@@ -10,18 +10,68 @@ done
 # export WORKERS=24
 
 #Submission queue:
-# ############################ Short and light load ########################
-export NUMCORES=9
+
+###############################################
+export NUMCORES=24 
 export WORKERCORES=1
-export WORKERS=9
+export WORKERS=24
 
 sed -e 's/$NUMCORES/'$NUMCORES'/g' \
     -e 's/$WORKERCORES/'$WORKERCORES'/g' \
     -e 's/$QUEUENAME/'$QUEUENAME'/g' \
-    -e 's/$NAME/'SU_SD'/g' \
-    -e 's/$SIMULATION/'SU_SD.py'/g' job_script.sh > temp.sh
+    -e 's/$NAME/'FF_G2'/g' \
+    -e 's/$SIMULATION/'FF_G2.py'/g' job_script.sh > temp.sh
 qsub -V temp.sh
 
+sed -e 's/$NUMCORES/'$NUMCORES'/g' \
+    -e 's/$WORKERCORES/'$WORKERCORES'/g' \
+    -e 's/$QUEUENAME/'$QUEUENAME'/g' \
+    -e 's/$NAME/'FF_G3'/g' \
+    -e 's/$SIMULATION/'FF_G3.py'/g' job_script.sh > temp.sh
+qsub -V temp.sh
+
+sed -e 's/$NUMCORES/'$NUMCORES'/g' \
+    -e 's/$WORKERCORES/'$WORKERCORES'/g' \
+    -e 's/$QUEUENAME/'$QUEUENAME'/g' \
+    -e 's/$NAME/'FF_G3'/g' \
+    -e 's/$SIMULATION/'FSS_G2.py'/g' job_script.sh > temp.sh
+qsub -V temp.sh
+
+sed -e 's/$NUMCORES/'$NUMCORES'/g' \
+    -e 's/$WORKERCORES/'$WORKERCORES'/g' \
+    -e 's/$QUEUENAME/'$QUEUENAME'/g' \
+    -e 's/$NAME/'RT_SU_C'/g' \
+    -e 's/$SIMULATION/'RT_SU_C.py'/g' job_script.sh > temp.sh
+qsub -V temp.sh
+
+sed -e 's/$NUMCORES/'$NUMCORES'/g' \
+    -e 's/$WORKERCORES/'$WORKERCORES'/g' \
+    -e 's/$QUEUENAME/'$QUEUENAME'/g' \
+    -e 's/$NAME/'RT_SU_S'/g' \
+    -e 's/$SIMULATION/'RT_SU_S.py'/g' job_script.sh > temp.sh
+qsub -V temp.sh
+
+
+export NUMCORES=32
+export WORKERCORES=1
+export WORKERS=32
+sed -e 's/$NUMCORES/'$NUMCORES'/g' \
+    -e 's/$WORKERCORES/'$WORKERCORES'/g' \
+    -e 's/$QUEUENAME/'$QUEUENAME'/g' \
+    -e 's/$NAME/'FF_G3'/g' \
+    -e 's/$SIMULATION/'FSS_G2.py'/g' job_script.sh > temp.sh
+qsub -V temp.sh
+
+sed -e 's/$NUMCORES/'$NUMCORES'/g' \
+    -e 's/$WORKERCORES/'$WORKERCORES'/g' \
+    -e 's/$QUEUENAME/'$QUEUENAME'/g' \
+    -e 's/$NAME/'RT_FU'/g' \
+    -e 's/$SIMULATION/'RT_FU.py'/g' job_script.sh > temp.sh
+qsub -V temp.sh
+#########################################################################
+
+
+# # ######################### MERA ##############################
 export NUMCORES=1
 export WORKERCORES=1
 export WORKERS=1
@@ -29,51 +79,27 @@ export WORKERS=1
 sed -e 's/$NUMCORES/'$NUMCORES'/g' \
     -e 's/$WORKERCORES/'$WORKERCORES'/g' \
     -e 's/$QUEUENAME/'$QUEUENAME'/g' \
-    -e 's/$NAME/'C1_SD'/g' \
-    -e 's/$SIMULATION/'ANNNP_C1_SD.py'/g' job_script.sh > temp.sh
+    -e 's/$NAME/'MERA_C1'/g' \
+    -e 's/$SIMULATION/'MERA_C1.py'/g' job_script.sh > temp.sh
 qsub -V temp.sh
 
 sed -e 's/$NUMCORES/'$NUMCORES'/g' \
     -e 's/$WORKERCORES/'$WORKERCORES'/g' \
     -e 's/$QUEUENAME/'$QUEUENAME'/g' \
-    -e 's/$NAME/'C2_SD'/g' \
-    -e 's/$SIMULATION/'ANNNP_C2_SD.py'/g' job_script.sh > temp.sh
+    -e 's/$NAME/'MERA_G2'/g' \
+    -e 's/$SIMULATION/'MERA_G2.py'/g' job_script.sh > temp.sh
 qsub -V temp.sh
+
+export NUMCORES=13
+export WORKERCORES=1
+export WORKERS=13
 
 sed -e 's/$NUMCORES/'$NUMCORES'/g' \
     -e 's/$WORKERCORES/'$WORKERCORES'/g' \
     -e 's/$QUEUENAME/'$QUEUENAME'/g' \
-    -e 's/$NAME/'G2_SD'/g' \
-    -e 's/$SIMULATION/'ANNNP_G2_SD.py'/g' job_script.sh > temp.sh
+    -e 's/$NAME/'MERA_G2'/g' \
+    -e 's/$SIMULATION/'MERA_G2.py'/g' job_script.sh > temp.sh
 qsub -V temp.sh
-#########################################################################
-
-
-########################## Extensive but light load #####################
-# export NUMCORES=32 
-# export WORKERCORES=1
-# export WORKERS=32
-
-# sed -e 's/$NUMCORES/'$NUMCORES'/g' \
-#     -e 's/$WORKERCORES/'$WORKERCORES'/g' \
-#     -e 's/$QUEUENAME/'$QUEUENAME'/g' \
-#     -e 's/$NAME/'FSS_G2'/g' \
-#     -e 's/$SIMULATION/'ANNNP_FSS_G2.py'/g' job_script.sh > temp.sh
-# qsub -V temp.sh
-#########################################################################
-
-
-# # ######################### Expensive load ##############################
-# export NUMCORES=32 
-# export WORKERCORES=4
-# export WORKERS=8
-
-# sed -e 's/$NUMCORES/'$NUMCORES'/g' \
-#     -e 's/$WORKERCORES/'$WORKERCORES'/g' \
-#     -e 's/$QUEUENAME/'$QUEUENAME'/g' \
-#     -e 's/$NAME/'FSS_G2'/g' \
-#     -e 's/$SIMULATION/'ANNNP_FSS_C2.py'/g' job_script.sh > temp.sh
-# qsub -V temp.sh
 # #########################################################################
 
 rm -r temp.sh
