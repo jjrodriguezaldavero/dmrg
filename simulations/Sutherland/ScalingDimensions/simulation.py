@@ -14,6 +14,7 @@ from tools.Plotter.PlotterSutherland import PlotterSutherland
 
 # Algorithm parameters
 algo_params = {
+    'd': 3,
     'E_tol': 5e-7, # Convergence criteria
 
     # Round parameters:

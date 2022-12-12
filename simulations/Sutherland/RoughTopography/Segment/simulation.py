@@ -6,7 +6,6 @@ import numpy as np
 from pathos.multiprocessing import ProcessingPool as Pool
 
 from models.Sutherland import Sutherland as Model
-from algorithms import DMRG as Algorithm
 
 from tools import tools
 from tools.Processor.ProcessorSutherland import ProcessorSutherland
@@ -48,7 +47,7 @@ sector_params = {
 def run(workers, simulation_path, parallel, use_cluster):
     """Run a pool workers in parallel"""
 
-    worker = tools.build_worker(Model, Algorithm, model_params, algo_params, sector_params, simulation_path)
+    worker = tools.build_worker_DMRG(Model, model_params, algo_params, sector_params, simulation_path)
     iterable = np.stack(np.meshgrid(H_params['L'], H_params['theta']), -1).reshape(-1,2)
 
     if parallel == True:

@@ -6,7 +6,7 @@ CWD = os.getcwd()
 SIMULATION_PATH = os.path.dirname(os.path.realpath(__file__))
 
 ###### UPSTREAM OR DOWNSTREAM OR UPSTREAM DELETE ######
-SYNC_DIRECTION = "DOWNSTREAM"
+SYNC_DIRECTION = "UPSTREAM DELETE"
 #######################################################
 
 sys.path.append(CWD)
