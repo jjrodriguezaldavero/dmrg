@@ -17,7 +17,7 @@ export MKL_NUM_THREADS=$WORKERCORES
 export OMP_NUM_THREADS=$WORKERCORES
 
 # Job
-python3 /nethome/6835384/dmrg/$SIMULATION
+python3 /nethome/6835384/dmrg/queue/$SIMULATION
 
 # Resource consumption
 qstat -j $JOB_ID | awk 'NR==1,/^scheduling info:/'
